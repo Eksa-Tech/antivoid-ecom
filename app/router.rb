@@ -44,6 +44,8 @@ class Router
       end
     when '/order-success'
       render_view('order_success')
+    when '/sitemap.xml'
+      render_sitemap
     when '/login'
       if @req.post?
         handle_login
@@ -290,6 +292,28 @@ class Router
     else
       redirect_to('/cart')
     end
+  end
+
+  def render_sitemap
+    products = Product.all
+    base_url = "https://#{@req.host_with_port}"
+    
+    xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    xml += "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n"
+    
+    # Home & Core Pages
+    ["", "/shop", "/categories", "/about", "/contact", "/terms"].each do |path|
+      xml += "  <url><loc>#{base_url}#{path}</loc><priority>#{path == '' ? '1.0' : '0.8'}</priority></url>\n"
+    end
+    
+    # Products
+    products.each do |p|
+      xml += "  <url><loc>#{base_url}/product?id=#{p.id}</loc><priority>0.6</priority></url>\n"
+    end
+    
+    xml += "</urlset>"
+    
+    [200, { 'Content-Type' => 'application/xml' }, [xml]]
   end
 
   def render_view(view, locals = {}, layout: true)

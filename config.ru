@@ -9,7 +9,7 @@ Dotenv.load
 
 # Use Rack::Static to serve files from the public folder
 use Rack::Static, 
-  urls: ["/css", "/js", "/images"],
+  urls: ["/css", "/js", "/images", "/robots.txt"],
   root: "public"
 
 # Use Rack::Session::Cookie for simple session management

@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antivoid Shop - Modern E-Commerce</title>
+    <title><%= @title || 'Antivoid Shop - Toko Online Premium & Modern' %></title>
+    <meta name="description" content="<%= @description || 'Toko online premium dengan desain modern Glassmorphism. Temukan produk terbaik dengan harga kompetitif dan pengiriman cepat.' %>">
+    <meta name="keywords" content="e-commerce, ruby, shop, premium, glassmorphism, belanja online, antivoid">
+    <link rel="canonical" href="<%= @req.url %>">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= @req.url %>">
+    <meta property="og:title" content="<%= @title || 'Antivoid Shop' %>">
+    <meta property="og:description" content="<%= @description || 'Toko online premium dengan desain modern Glassmorphism.' %>">
+    <meta property="og:image" content="<%= @og_image || '/images/og-default.png' %>">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<%= @req.url %>">
+    <meta property="twitter:title" content="<%= @title || 'Antivoid Shop' %>">
+    <meta property="twitter:description" content="<%= @description || 'Toko online premium dengan desain modern Glassmorphism.' %>">
+    <meta property="twitter:image" content="<%= @og_image || '/images/og-default.png' %>">
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">

@@ -4,7 +4,8 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
 
 ## ✨ Fitur Utama
 
-- **Premium Design**: Tema Glassmorphism modern dengan animasi halus (Animate.css) dan ikon Lucide.
+- **SEO Optimized**: Meta tags dinamis, Open Graph support, sitemap.xml, dan robots.txt untuk indeksasi Google yang lebih baik.
+- **Structured Data**: Mendukung JSON-LD untuk rich snippets produk di hasil pencarian.
 - **Email Receipt (Brevo)**: Pengiriman struk belanja otomatis ke email pelanggan setelah checkout.
 - **Katalog Produk & Kategori**: Penjelajahan produk yang mudah dengan filter kategori.
 - **Sistem Keranjang Belanja**: Pembaruan unit barang reaktif (AJAX) dan perhitungan total otomatis.

@@ -3,7 +3,35 @@
     unless product
         return redirect_to('/shop')
     end
+
+    # SEO Meta Tags
+    @title = "#{product.name} - Antivoid Shop"
+    @description = product.description[0..155]
+    @og_image = product.image_url
 %>
+
+<!-- JSON-LD Structured Data for Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "<%= product.name %>",
+  "image": "<%= product.image_url %>",
+  "description": "<%= product.description.gsub('"', '\"') %>",
+  "brand": {
+    "@type": "Brand",
+    "name": "Antivoid"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "<%= @req.url %>",
+    "priceCurrency": "IDR",
+    "price": "<%= product.price %>",
+    "availability": "https://schema.org/<%= product.stock > 0 ? 'InStock' : 'OutOfStock' %>",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
 <div class="max-w-7xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
     <!-- Breadcrumb -->
     <nav class="flex mb-10 overflow-x-auto whitespace-nowrap pb-2" aria-label="Breadcrumb">
