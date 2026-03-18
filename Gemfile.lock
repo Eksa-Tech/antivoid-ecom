@@ -35,9 +35,10 @@ GEM
     ostruct (0.6.3)
     puma (6.6.1)
       nio4r (~> 2.0)
-    rack (3.0.0)
-    rack-session (1.0.0)
-      rack (<= 3)
+    rack (3.2.5)
+    rack-session (2.1.1)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
     rackup (2.3.1)
       rack (>= 3)
     uri (1.1.1)
@@ -56,7 +57,7 @@ DEPENDENCIES
   mongo (~> 2.19)
   puma (~> 6.4)
   rack (~> 3.0)
-  rack-session (~> 1.0)
+  rack-session (~> 2.0)
   rackup (~> 2.1)
 
 CHECKSUMS
@@ -79,8 +80,8 @@ CHECKSUMS
   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
   puma (6.6.1) sha256=b9b56e4a4ea75d1bfa6d9e1972ee2c9f43d0883f011826d914e8e37b3694ea1e
-  rack (3.0.0) sha256=197adbbe5d585dca1909fe6c544f369919d795d54fc76f86b6ce458008f6e29c
-  rack-session (1.0.0) sha256=4f9b4b7536ac58664980465c836385bc02a21ceaff0def4dca30105d82c188e2
+  rack (3.2.5) sha256=4cbd0974c0b79f7a139b4812004a62e4c60b145cba76422e288ee670601ed6d3
+  rack-session (2.1.1) sha256=0b6dc07dea7e4b583f58a48e8b806d4c9f1c6c9214ebc202ec94562cbea2e4e9
   rackup (2.3.1) sha256=6c79c26753778e90983761d677a48937ee3192b3ffef6bc963c0950f94688868
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
 

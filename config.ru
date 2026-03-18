@@ -1,7 +1,7 @@
 require 'dotenv/load'
 require 'rack'
 require 'rackup'
-require 'rack/session/cookie'
+require 'rack/session'
 require_relative 'app/app'
 
 # Load Environment Variables

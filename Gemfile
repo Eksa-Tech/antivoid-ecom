@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rack', '~> 3.0'
-gem 'rack-session', '~> 1.0'
+gem 'rack-session', '~> 2.0'
 gem 'rackup', '~> 2.1'
 gem 'puma', '~> 6.4'
 gem 'mongo', '~> 2.19'
