@@ -267,13 +267,24 @@ class Router
     end
 
     if items.any?
-      Order.create(
+      order_data = {
         customer_name: @req.params['customer_name'],
         contact: @req.params['contact'],
+        customer_email: @req.params['customer_email'],
         address: @req.params['address'],
         items: items,
         total_price: total
-      )
+      }
+      
+      result = Order.create(order_data)
+      
+      # Send Receipt Email via Brevo
+      if result && result.inserted_id
+        require_relative 'utils/email_helper'
+        order = Order.find(result.inserted_id.to_s)
+        EmailHelper.send_receipt(order) if order
+      end
+
       @req.session['cart'] = {}
       redirect_to('/order-success')
     else

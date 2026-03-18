@@ -5,15 +5,19 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
 ## ✨ Fitur Utama
 
 - **Premium Design**: Tema Glassmorphism modern dengan animasi halus (Animate.css) dan ikon Lucide.
+- **Email Receipt (Brevo)**: Pengiriman struk belanja otomatis ke email pelanggan setelah checkout.
 - **Katalog Produk & Kategori**: Penjelajahan produk yang mudah dengan filter kategori.
 - **Sistem Keranjang Belanja**: Pembaruan unit barang reaktif (AJAX) dan perhitungan total otomatis.
+- **Profil Perusahaan**: Halaman statis "Tentang Kami", "Kontak", dan "Syarat & Ketentuan".
 - **Panel Admin (CMS)**:
+  - Dashboard Analitik Penjualan dengan statistik real-time.
   - Manajemen Produk (Tambah/Edit/Hapus) dengan integrasi Cloudinary.
   - Manajemen Kategori.
   - Kelola Pesanan & Generasi Nomor Resi otomatis.
-  - Dashboard Analitik Penjualan.
-- **Paginasi Efisien**: Menggunakan server-side pagination untuk performa cepat pada data besar.
-- **Cloudinary Integration**: Pembersihan otomatis aset gambar saat produk dihapus atau diperbarui.
+- **Performa & Kompatibilitas**:
+  - Paginasi Efisien pada katalog dan data admin.
+  - Full support untuk Ruby 3.4+ dan Rack 3.
+  - Cloudinary Cleanup: Pembersihan otomatis aset gambar yang tidak terpakai.
 - **Mobile Responsive**: Pengalaman navigasi yang mulus di perangkat mobile dengan menu hamburger.
 
 ## 🚀 Teknologi
@@ -21,6 +25,7 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
 - **Bahasa**: [Ruby 3.3+](https://www.ruby-lang.org/)
 - **Server**: [Puma](https://puma.io/) via [Rack](https://github.com/rack/rack)
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas)
+- **Email**: [Brevo API](https://www.brevo.com/)
 - **Gambar**: [Cloudinary](https://cloudinary.com/)
 - **Frontend**: [Tailwind CSS](https://tailwindcss.com/), [Animate.css](https://animate.style/), [Lucide Icons](https://lucide.dev/)
 - **Templating**: ERB (Embedded Ruby)
@@ -44,11 +49,13 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
    cp .env.example .env
    ```
    Pastikan Anda mengisi:
-   - `MONGODB_URI`=mongodb+srv://admin:admin@cluster0.mongodb.net/e-commerce?retryWrites=true&w=majority
-   - `CLOUDINARY_URL`=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-   - `JWT_SECRET`=d2cdf94c99822261cf4e91a9cb37eeb9da5fb70baa013444f48eb829e94f99c5
-   - `ADMIN_EMAIL`=admin@example.com
-   - `ADMIN_PASSWORD`=password123
+   - `MONGODB_URI`: Koneksi MongoDB Atlas.
+   - `CLOUDINARY_URL`: API Cloudinary Environment.
+   - `BREVO_API_KEY`: API Key untuk pengiriman email.
+   - `SENDER_EMAIL`: Email pengirim yang terverifikasi.
+   - `JWT_SECRET`: Secret key untuk enkripsi session.
+   - `ADMIN_EMAIL`: Email untuk login admin.
+   - `ADMIN_PASSWORD`: Password untuk login admin.
    - `PORT`=9292
 
 4. **Jalankan Aplikasi**:
