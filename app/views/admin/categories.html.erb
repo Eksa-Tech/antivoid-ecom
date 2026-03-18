@@ -1,0 +1,75 @@
+<div class="max-w-7xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
+    <div class="mb-10">
+        <a href="/admin" class="text-sm font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-2 mb-4">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Kembali ke Dashboard
+        </a>
+        <h1 class="text-4xl font-black text-slate-900 mb-2">Kelola Kategori</h1>
+        <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+    </div>
+
+    <div class="lg:grid lg:grid-cols-12 lg:gap-12 items-start">
+        <!-- Add Category Form -->
+        <div class="lg:col-span-4 mb-12 lg:mb-0">
+            <div class="glass p-8 rounded-[40px] border border-white/60 shadow-xl relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600/5 blur-3xl rounded-full"></div>
+                <h2 class="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                    <i data-lucide="folder-plus" class="w-6 h-6 text-indigo-600"></i> Tambah Baru
+                </h2>
+                
+                <form action="/admin/categories" method="POST" class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 mb-2 ml-1 uppercase tracking-widest">Nama Kategori</label>
+                        <input type="text" name="name" required placeholder="Contoh: Elektronik"
+                            class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-xl shadow-slate-200 hover:bg-indigo-600 transition flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-5 h-5"></i> Simpan Kategori
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Categories List -->
+        <div class="lg:col-span-8">
+            <div class="glass rounded-[40px] overflow-hidden border border-white/60 shadow-xl bg-white/30">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/5 text-slate-500 border-b border-white/40">
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-widest">Nama Kategori</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-widest">Slug</th>
+                            <th class="px-8 py-5 text-xs font-black uppercase tracking-widest text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/40">
+                        <% Category.all.each do |category| %>
+                        <tr class="hover:bg-white/50 transition">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="tag" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-slate-900"><%= category.name %></span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <code class="text-xs bg-slate-100 px-2 py-1 rounded-md text-slate-500"><%= category.slug %></code>
+                            </td>
+                            <td class="px-8 py-5 text-center">
+                                <a href="/admin/categories/delete?id=<%= category.id %>" onclick="return confirm('Hapus kategori ini?')"
+                                    class="inline-flex items-center justify-center w-10 h-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% end %>
+                        <% if Category.all.empty? %>
+                            <tr>
+                                <td colspan="3" class="px-8 py-20 text-center text-slate-400 font-medium italic">Belum ada kategori ditambahkan.</td>
+                            </tr>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

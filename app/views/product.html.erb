@@ -1,0 +1,109 @@
+<% 
+    product = Product.find(@req.params['id']) 
+    unless product
+        return redirect_to('/shop')
+    end
+%>
+<div class="max-w-7xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-10 overflow-x-auto whitespace-nowrap pb-2" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="/" class="text-sm font-medium text-slate-500 hover:text-indigo-600 flex items-center gap-2">
+                    <i data-lucide="home" class="w-4 h-4"></i> Beranda
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center text-slate-400">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <a href="/shop" class="ml-1 text-sm font-medium text-slate-500 hover:text-indigo-600 md:ml-2">Belanja</a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center text-slate-400">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    <span class="ml-1 text-sm font-bold text-slate-900 md:ml-2 line-clamp-1"><%= product.name %></span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
+        <!-- Image Gallery -->
+        <div class="animate__animated animate__fadeInLeft">
+            <div class="glass p-4 rounded-[40px] shadow-2xl border border-white/60 overflow-hidden group">
+                <div class="aspect-square bg-slate-100 rounded-[30px] overflow-hidden relative">
+                    <img src="<%= product.image_url || 'https://via.placeholder.com/800' %>" 
+                        alt="<%= product.name %>" 
+                        class="w-full h-full object-center object-cover transition duration-700 group-hover:scale-105">
+                    <div class="absolute top-6 left-6">
+                        <span class="glass-dark text-white text-xs px-4 py-1.5 rounded-full font-bold uppercase tracking-widest bg-indigo-600/80">Kualitas Premium</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Specs -->
+        <div class="mt-12 px-2 sm:mt-16 lg:mt-0 animate__animated animate__fadeInRight">
+            <div class="mb-8">
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full mb-4 inline-block">
+                    <%= Category.all.find{|c| c.id.to_s == product.category_id}&.name || 'Uncategorized' %>
+                </span>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4"><%= product.name %></h1>
+                <p class="text-4xl font-black text-indigo-600"><%= ViewHelper.format_rupiah(product.price) %></p>
+            </div>
+
+            <div class="glass p-8 rounded-3xl border border-white/60 mb-8">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="align-left" class="w-5 h-5 text-indigo-600"></i> Deskripsi Produk
+                </h3>
+                <div class="prose prose-slate text-slate-500 leading-relaxed">
+                    <%= product.description %>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-10">
+                <div class="glass p-4 rounded-2xl border border-white/40 flex items-center gap-4">
+                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-tighter">Status</p>
+                        <p class="text-sm font-bold text-slate-800"><%= product.stock > 0 ? 'Tersedia' : 'Habis' %></p>
+                    </div>
+                </div>
+                <div class="glass p-4 rounded-2xl border border-white/40 flex items-center gap-4">
+                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="package" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-tighter">Stok</p>
+                        <p class="text-sm font-bold text-slate-800"><%= product.stock %> Unit</p>
+                    </div>
+                </div>
+            </div>
+
+            <form action="/cart/add" method="POST" class="flex flex-col sm:flex-row gap-4">
+                <input type="hidden" name="product_id" value="<%= product.id %>">
+                <div class="glass rounded-2xl border border-white/60 p-1 flex items-center">
+                    <button type="button" onclick="this.nextElementSibling.stepDown()" class="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600"><i data-lucide="minus" class="w-5 h-5"></i></button>
+                    <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>" 
+                        class="w-16 bg-transparent text-center font-bold text-lg outline-none appearance-none">
+                    <button type="button" onclick="this.previousElementSibling.stepUp()" class="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                </div>
+                <button type="submit" class="flex-grow bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 hover:bg-slate-900 transition flex items-center justify-center gap-3">
+                    <i data-lucide="shopping-cart" class="w-6 h-6"></i> Masukkan ke Keranjang
+                </button>
+            </form>
+
+            <div class="mt-12 flex items-center gap-6">
+                <div class="flex -space-x-2">
+                    <img src="https://i.pravatar.cc/100?u=1" class="w-8 h-8 rounded-full border-2 border-white">
+                    <img src="https://i.pravatar.cc/100?u=2" class="w-8 h-8 rounded-full border-2 border-white">
+                    <img src="https://i.pravatar.cc/100?u=3" class="w-8 h-8 rounded-full border-2 border-white">
+                </div>
+                <p class="text-sm text-slate-500 font-medium">12+ orang membeli produk ini hari ini</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+<% product = @product %>
+<div class="max-w-4xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
+    <div class="mb-10 flex items-center justify-between">
+        <div>
+            <a href="/admin/products" class="text-sm font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-2 mb-4">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Daftar
+            </a>
+            <h1 class="text-4xl font-black text-slate-900 mb-2">Edit Produk</h1>
+            <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+            <p class="text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest">ID: <%= product.id %></p>
+        </div>
+    </div>
+
+    <div class="glass p-10 rounded-[48px] border border-white/60 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-600/5 blur-3xl rounded-full"></div>
+        
+        <form action="/admin/products/update" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <input type="hidden" name="id" value="<%= product.id %>">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Nama Produk</label>
+                        <input type="text" name="name" value="<%= product.name %>" required
+                            class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm font-medium">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Kategori</label>
+                        <div class="relative">
+                            <select name="category_id" required class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm appearance-none font-medium text-slate-700">
+                                <% Category.all.each do |cat| %>
+                                    <option value="<%= cat.id %>" <%= 'selected' if product.category_id == cat.id.to_s %>><%= cat.name %></option>
+                                <% end %>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Harga (Rp)</label>
+                            <input type="number" step="1" name="price" value="<%= product.price.to_i %>" required
+                                class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Stok Saat Ini</label>
+                            <input type="number" name="stock" value="<%= product.stock %>" required
+                                class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Ganti Gambar (Opsional)</label>
+                        <div class="relative group">
+                            <input type="file" name="image" id="image-upload" class="hidden" onchange="previewImage(this)">
+                            <label for="image-upload" class="cursor-pointer block w-full aspect-square glass border border-white/60 rounded-3xl flex flex-col items-center justify-center hover:bg-white/50 transition relative overflow-hidden">
+                                <img id="preview" src="<%= product.image_url %>" class="absolute inset-0 w-full h-full object-cover <%= product.image_url ? '' : 'hidden' %>">
+                                <div id="upload-placeholder" class="relative z-10 flex flex-col items-center justify-center <%= product.image_url ? 'opacity-0' : '' %>">
+                                    <i data-lucide="refresh-cw" class="w-12 h-12 text-slate-400 mb-3 group-hover:text-indigo-600 transition"></i>
+                                    <span class="text-xs font-bold text-slate-500 group-hover:text-indigo-600">Ubah Foto Produk</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function previewImage(input) {
+                    const preview = document.getElementById('preview');
+                    const placeholder = document.getElementById('upload-placeholder');
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.src = e.target.result;
+                            preview.classList.remove('hidden');
+                            placeholder.classList.add('opacity-0');
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+            </script>
+
+            <div>
+                <label class="block text-xs font-black text-slate-500 mb-3 ml-1 uppercase tracking-widest">Deskripsi Produk</label>
+                <textarea name="description" rows="4"
+                    class="w-full glass bg-white/50 border border-white/60 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm font-medium"><%= product.description %></textarea>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <button type="submit" class="flex-grow bg-slate-900 text-white py-5 rounded-2xl font-black text-xl shadow-xl shadow-slate-200 hover:bg-indigo-600 transition flex items-center justify-center gap-3">
+                    <i data-lucide="save" class="w-6 h-6"></i> Perbarui Data Produk
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

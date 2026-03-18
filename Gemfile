@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+gem 'rack', '~> 3.0'
+gem 'rack-session', '~> 1.0'
+gem 'rackup', '~> 2.1'
+gem 'puma', '~> 6.4'
+gem 'mongo', '~> 2.19'
+gem 'jwt', '~> 2.8'
+gem 'bcrypt', '~> 3.1'
+gem 'cloudinary', '~> 2.0'
+gem 'dotenv', '~> 3.1'
+gem 'erb'
+gem 'json'

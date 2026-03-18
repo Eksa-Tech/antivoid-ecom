@@ -1,0 +1,111 @@
+<div class="max-w-7xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
+    <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+            <a href="/admin" class="text-sm font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-2 mb-4">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Kembali ke Dashboard
+            </a>
+            <h1 class="text-4xl font-black text-slate-900 mb-2">Kelola Produk</h1>
+            <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+        </div>
+        <a href="/admin/products/new" 
+            class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 hover:bg-slate-900 transition flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-6 h-6"></i> Tambah Produk
+        </a>
+    </div>
+
+    <!-- Products Table -->
+    <div class="glass rounded-[40px] overflow-hidden border border-white/60 shadow-xl bg-white/30">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900/5 text-slate-500 border-b border-white/40">
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest">Gambar</th>
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest">Nama Produk</th>
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest text-center">Kategori</th>
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest text-center">Harga</th>
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest text-center">Stok</th>
+                        <th class="px-8 py-5 text-xs font-black uppercase tracking-widest text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/40">
+                    <% 
+                        per_page = 10
+                        current_page = (@req.params['page'] || 1).to_i
+                        total_products = Product.count({})
+                        total_pages = (total_products.to_f / per_page).ceil
+                        skip = (current_page - 1) * per_page
+                        products = Product.all({}, limit: per_page, skip: skip)
+                        
+                        def page_url(req, p)
+                            params = req.params.dup
+                            params['page'] = p
+                            "?" + params.map{|k,v| "#{k}=#{v}"}.join("&")
+                        end
+                    %>
+                    <% products.each do |product| %>
+                    <tr class="hover:bg-white/50 transition">
+                        <td class="px-8 py-5">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden glass border border-white/60">
+                                <img src="<%= product.image_url || 'https://via.placeholder.com/100' %>" class="w-full h-full object-cover">
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <h4 class="font-bold text-slate-900"><%= product.name %></h4>
+                            <p class="text-xs text-slate-400 font-medium">ID: <%= product.id %></p>
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase">
+                                <%= Category.all.find{|c| c.id.to_s == product.category_id}&.name || 'Uncategorized' %>
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-center font-black text-slate-900"><%= ViewHelper.format_rupiah(product.price) %></td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="font-bold <%= product.stock < 10 ? 'text-red-500 animate-pulse' : 'text-slate-600' %>">
+                                <%= product.stock %>
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            <div class="flex items-center justify-center gap-3">
+                                <a href="/admin/products/edit?id=<%= product.id %>"
+                                    class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-600 hover:text-white transition shadow-sm">
+                                    <i data-lucide="edit-3" class="w-5 h-5"></i>
+                                </a>
+                                <a href="/admin/products/delete?id=<%= product.id %>" onclick="return confirm('Hapus produk ini?')"
+                                    class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-sm">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <% if total_pages > 1 %>
+        <div class="mt-10 flex justify-center items-center gap-2">
+            <% if current_page > 1 %>
+                <a href="<%= page_url(@req, current_page - 1) %>" 
+                    class="glass border border-white/60 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-900 hover:text-white transition shadow-sm text-xs">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </a>
+            <% end %>
+
+            <% (1..total_pages).each do |p| %>
+                <a href="<%= page_url(@req, p) %>" 
+                    class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition shadow-sm
+                    <%= p == current_page ? 'bg-indigo-600 text-white shadow-indigo-100' : 'glass border border-white/60 hover:bg-white' %>">
+                    <%= p %>
+                </a>
+            <% end %>
+
+            <% if current_page < total_pages %>
+                <a href="<%= page_url(@req, current_page + 1) %>" 
+                    class="glass border border-white/60 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-900 hover:text-white transition shadow-sm text-xs">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+            <% end %>
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,27 @@
+# Ignore environment variables
+.env
+.env.local
+
+# Ignore logs
+*.log
+log/*.log
+
+# Ignore dependencies
+.bundle/
+vendor/bundle
+node_modules/
+
+# Ignore IDE/Editor files
+.ruby-lsp/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary files
+tmp/
+*.tmp
