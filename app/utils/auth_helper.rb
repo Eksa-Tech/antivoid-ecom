@@ -18,7 +18,7 @@ module AuthHelper
     return false unless token
 
     payload = decode_token(token)
-    !!payload
+    payload && payload['user_id']
   end
 
   def self.current_user(req)
@@ -26,8 +26,13 @@ module AuthHelper
     return nil unless token
 
     payload = decode_token(token)
-    return nil unless payload
+    return nil unless payload && payload['user_id']
 
-    User.from_hash(payload) # Assumes payload contains enough info
+    User.find(payload['user_id'])
+  end
+
+  def self.admin?(req)
+    user = current_user(req)
+    user && user.role == 'admin'
   end
 end

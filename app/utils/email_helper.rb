@@ -36,9 +36,41 @@ module EmailHelper
     end
     
     response.code == '201'
+  end
+
+  def self.send_admin_order_notification(order, base_url = "https://antivoid-ecom.up.railway.app")
+    return unless ENV['BREVO_API_KEY'] && ENV['ADMIN_EMAIL']
+
+    uri = URI.parse(BREVO_API_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Post.new(uri.request_uri)
+    request['api-key'] = ENV['BREVO_API_KEY']
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+
+    request.body = {
+      sender: { 
+        name: "Antivoid System", 
+        email: ENV['SENDER_EMAIL'] || "system@antivoid.shop" 
+      },
+      to: [{ email: ENV['ADMIN_EMAIL'], name: "Admin Antivoid" }],
+      subject: "🚨 PESANAN BARU MASUK: ##{order.id}",
+      htmlContent: "
+        <h3>Halo Admin,</h3>
+        <p>Ada pesanan baru dari <strong>#{order.customer_name}</strong> sebesar <strong>Rp #{order.total_price.to_s.gsub(/\B(?=(\d{3})+(?!\d))/, '.')}</strong>.</p>
+        <p><a href='#{base_url}/admin/orders/view?id=#{order.id}'>Klik di sini untuk melihat detail pesanan di Dashboard Admin.</a></p>
+      "
+    }.to_json
+
+    response = http.request(request)
+    
+    unless response.code == '201'
+      puts "Brevo Admin Email Error: #{response.body}"
+    end
   rescue StandardError => e
-    puts "Email delivery failed: #{e.message}"
-    false
+    puts "Admin email notification failed: #{e.message}"
   end
 
   private

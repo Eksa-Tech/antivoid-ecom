@@ -14,7 +14,8 @@ def seed_admin
     User.create(
       email: email,
       password: password,
-      name: 'Global Admin'
+      name: 'Global Admin',
+      role: 'admin'
     )
     puts "Admin user created: #{email} / #{password}"
   end

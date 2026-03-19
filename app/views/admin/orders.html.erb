@@ -3,8 +3,15 @@
         <a href="/admin" class="text-sm font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-2 mb-4">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Kembali ke Dashboard
         </a>
-        <h1 class="text-4xl font-black text-slate-900 mb-2">Kelola Pesanan</h1>
-        <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+        <div class="flex flex-wrap justify-between items-end gap-4">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 mb-2">Kelola Pesanan</h1>
+                <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+            </div>
+            <a href="/admin/orders/export" class="bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-slate-900 transition shadow-lg shadow-emerald-100">
+                <i data-lucide="download" class="w-5 h-5"></i> Ekspor CSV
+            </a>
+        </div>
     </div>
 
     <div class="glass rounded-[40px] overflow-hidden border border-white/60 shadow-xl bg-white/30">

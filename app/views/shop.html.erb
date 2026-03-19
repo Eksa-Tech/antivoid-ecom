@@ -64,8 +64,9 @@
         <% end %>
         
         <% products.each_with_index do |product, index| %>
-            <div class="group glass rounded-[32px] p-4 hover-lift border border-white/40 animate__animated animate__fadeInUp" 
+            <div class="group glass rounded-[32px] p-4 hover-lift border border-white/40 animate__animated animate__fadeInUp relative" 
                  style="animation-delay: <%= index * 0.1 %>s">
+                <a href="/product?id=<%= product.id %>" class="absolute inset-0 z-0"></a>
                 <div class="relative aspect-[4/5] rounded-24 overflow-hidden mb-6 bg-slate-100 rounded-2xl">
                     <img src="<%= product.image_url || 'https://via.placeholder.com/400' %>" 
                         alt="<%= product.name %>" 
@@ -74,24 +75,30 @@
                 </div>
                 
                 <div class="px-2 pb-2">
-                    <div class="flex justify-between items-start mb-3">
+                    <div class="flex justify-between items-start mb-3 relative z-10 pointer-events-none">
                         <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-full mb-2 inline-block">
                             <%= Category.all.find{|c| c.id.to_s == product.category_id}&.name || 'Uncategorized' %>
                         </span>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition mb-3">
-                        <a href="/product?id=<%= product.id %>"><%= product.name %></a>
+                    <h3 class="text-lg font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition mb-3 relative z-10 pointer-events-none">
+                        <%= product.name %>
                     </h3>
                     
-                    <div class="flex items-center justify-between mt-auto">
-                        <p class="text-2xl font-black text-slate-900"><%= ViewHelper.format_rupiah(product.price) %></p>
-                        <form action="/cart/add" method="POST" class="scale-0 group-hover:scale-100 transition-transform origin-right duration-300">
-                            <input type="hidden" name="product_id" value="<%= product.id %>">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="bg-indigo-600 text-white p-3 rounded-2xl hover:bg-slate-900 transition shadow-lg shadow-indigo-100">
-                                <i data-lucide="plus" class="w-5 h-5"></i>
-                            </button>
-                        </form>
+                    <div class="flex items-center justify-between mt-auto relative z-10">
+                        <p class="text-2xl font-black text-slate-900 pointer-events-none"><%= ViewHelper.format_rupiah(product.price) %></p>
+                        <% if product.stock > 0 %>
+                            <form action="/cart/add" method="POST" class="scale-0 group-hover:scale-100 transition-transform origin-right duration-300 cursor-pointer">
+                                <input type="hidden" name="product_id" value="<%= product.id %>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="bg-indigo-600 text-white p-3 rounded-2xl hover:bg-slate-900 transition shadow-lg shadow-indigo-100">
+                                    <i data-lucide="plus" class="w-5 h-5"></i>
+                                </button>
+                            </form>
+                        <% else %>
+                            <div class="scale-0 group-hover:scale-100 transition-transform origin-right duration-300 pointer-events-none">
+                                <span class="bg-rose-100 text-rose-600 px-3 py-2 rounded-xl font-bold text-sm shadow-sm border border-rose-200">Habis</span>
+                            </div>
+                        <% end %>
                     </div>
                 </div>
             </div>

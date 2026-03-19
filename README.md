@@ -2,34 +2,43 @@
 
 Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan estetika **Glassmorphism** dan fitur lengkap untuk kebutuhan bisnis online masa kini. Aplikasi ini menggunakan framework minimalis (Rack) untuk performa maksimal dan kemudahan kustomisasi.
 
-## ✨ Fitur Utama
+## ✨ Fitur Utama (Pelanggan)
 
-- **SEO Optimized**: Meta tags dinamis, Open Graph support, sitemap.xml, dan robots.txt untuk indeksasi Google yang lebih baik.
-- **Structured Data**: Mendukung JSON-LD untuk rich snippets produk di hasil pencarian.
-- **Email Receipt (Brevo)**: Pengiriman struk belanja otomatis ke email pelanggan setelah checkout.
-- **Katalog Produk & Kategori**: Penjelajahan produk yang mudah dengan filter kategori.
-- **Sistem Keranjang Belanja**: Pembaruan unit barang reaktif (AJAX) dan perhitungan total otomatis.
-- **Profil Perusahaan**: Halaman statis "Tentang Kami", "Kontak", dan "Syarat & Ketentuan".
-- **Panel Admin (CMS)**:
-  - Dashboard Analitik Penjualan dengan statistik real-time.
-  - Manajemen Produk (Tambah/Edit/Hapus) dengan integrasi Cloudinary.
-  - Manajemen Kategori.
-  - Kelola Pesanan & Generasi Nomor Resi otomatis.
-- **Performa & Kompatibilitas**:
-  - Paginasi Efisien pada katalog dan data admin.
-  - Full support untuk Ruby 3.4+ dan Rack 3.
-  - Cloudinary Cleanup: Pembersihan otomatis aset gambar yang tidak terpakai.
-- **Mobile Responsive**: Pengalaman navigasi yang mulus di perangkat mobile dengan menu hamburger.
+- **🛒 Sistem Belanja Reaktif**: Keranjang belanja dengan pembaruan unit barang instan dan perhitungan total otomatis.
+- **🔐 Secure Checkout**: Proses pembayaran yang aman dengan verifikasi stok real-time dan kewajiban autentikasi.
+- **❤️ Personalized Wishlist**: Simpan produk favorit Anda ke dalam daftar keinginan pribadi.
+- **⭐ Review & Rating Produk**: Berikan masukan dan penilaian pada produk yang telah dibeli.
+- **📱 Akun & Riwayat Pesanan**: Lacak status pesanan secara real-time dan kelola profil pengiriman Anda.
+- **🔍 Pencarian & Filter Canggih**: Temukan produk dengan mudah melalui fitur pencarian dan kategori yang terorganisir.
+- **📲 Integrasi WhatsApp**: Hubungi admin secara instan melalui formulir kontak yang terintegrasi WhatsApp.
+- **📧 Email Receipt Otomatis**: Terima struk belanja profesional langsung di email Anda setelah melakukan pemesanan.
 
-## 🚀 Teknologi
+## 🛠️ Panel Admin (CMS)
 
-- **Bahasa**: [Ruby 3.3+](https://www.ruby-lang.org/)
-- **Server**: [Puma](https://puma.io/) via [Rack](https://github.com/rack/rack)
+- **📊 Dashboard Analitik**: Statistik penjualan dan performa toko secara real-time.
+- **📦 Manajemen Produk Complete**: Tambah, edit, dan hapus produk dengan integrasi Cloudinary untuk optimasi gambar.
+- **📂 Manajemen Kategori**: Atur struktur katalog produk dengan mudah.
+- **🖼️ Banner & Promo**: Kelola slider promo pada halaman beranda secara dinamis.
+- **📋 Manajemen Pesanan**: Pantau pesanan masuk, perbarui status pengiriman, dan kelola nomor resi.
+- **📤 Export Data**: Ekspor data pesanan ke format CSV untuk kebutuhan akuntansi dan pelaporan.
+
+## 🚀 SEO & Optimasi Teknis
+
+- **📈 Google Ready**: Dilengkapi dengan `sitemap.xml` dan `robots.txt` otomatis.
+- **💎 Structured Data (JSON-LD)**: Dukungan rich snippets untuk tampilan produk yang lebih menonjol di hasil pencarian.
+- **Social Sharing**: Meta tags Open Graph (OG) dioptimalkan untuk berbagi di media sosial.
+- **⚡ Ultra Fast Performance**: Menggunakan Ruby Rack + Puma untuk waktu pemuatan halaman yang sangat cepat.
+- **🖼️ Asset Optimization**: Cloudinary CDN untuk pengiriman gambar responsif dan pembersihan otomatis storage.
+
+## 💻 Teknologi
+
+- **Core**: [Ruby 3.3+](https://www.ruby-lang.org/) dengan [Rack](https://github.com/rack/rack)
+- **Server**: [Puma](https://puma.io/)
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas)
-- **Email**: [Brevo API](https://www.brevo.com/)
-- **Gambar**: [Cloudinary](https://cloudinary.com/)
-- **Frontend**: [Tailwind CSS](https://tailwindcss.com/), [Animate.css](https://animate.style/), [Lucide Icons](https://lucide.dev/)
-- **Templating**: ERB (Embedded Ruby)
+- **Storage & CDN**: [Cloudinary](https://cloudinary.com/)
+- **Email Gateway**: [Brevo API](https://www.brevo.com/)
+- **Frontend**: [Tailwind CSS](https://tailwindcss.com/), [Glassmorphism UI](https://glassmorphism.com/), [Lucide Icons](https://lucide.dev/), [Animate.css](https://animate.style/)
+- **Keamanan**: BCrypt Password Hashing, JWT-based Sessions.
 
 ## 📦 Instalasi
 
@@ -53,11 +62,9 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
    - `MONGODB_URI`: Koneksi MongoDB Atlas.
    - `CLOUDINARY_URL`: API Cloudinary Environment.
    - `BREVO_API_KEY`: API Key untuk pengiriman email.
-   - `SENDER_EMAIL`: Email pengirim yang terverifikasi.
    - `JWT_SECRET`: Secret key untuk enkripsi session.
-   - `ADMIN_EMAIL`: Email untuk login admin.
-   - `ADMIN_PASSWORD`: Password untuk login admin.
-   - `PORT`=9292
+   - `ADMIN_EMAIL`: Email login admin.
+   - `ADMIN_PASSWORD`: Password login admin.
 
 4. **Jalankan Aplikasi**:
    ```bash
@@ -66,11 +73,11 @@ Antivoid adalah aplikasi e-commerce modern berbasis Ruby yang dirancang dengan e
 
 ## 🛠️ Struktur Proyek
 
-- `app/models/`: Logika data (Product, Category, Order, User).
-- `app/views/`: Template HTML dengan ERB.
-- `app/router.rb`: Pengatur rute aplikasi dan logika kontroler.
-- `app/utils/`: Helper fungsional (Database, Auth, Cloudinary).
-- `public/`: Aset statis (CSS, JS, Gambar).
+- `app/models/`: Logika data (Product, Category, Order, User, Review, Banner).
+- `app/views/`: Template HTML dengan ERB dan Glassmorphism styling.
+- `app/controllers/`: Logika bisnis (Auth, Admin, Shop).
+- `app/router.rb`: Pengatur rute aplikasi.
+- `app/utils/`: Helper fungsional (Database, Auth, Cloudinary, Email).
 
 ## 📄 Lisensi
 

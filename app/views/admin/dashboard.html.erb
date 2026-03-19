@@ -29,7 +29,7 @@
                 <i data-lucide="shopping-cart" class="w-6 h-6"></i>
             </div>
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Total Pesanan</p>
-            <h3 class="text-2xl font-black text-slate-900"><%= Order.count %></h3>
+            <h3 class="text-2xl font-black text-slate-900"><%= Order.count({}) %></h3>
         </div>
         
         <div class="glass p-6 rounded-[32px] border border-white/60 shadow-sm hover-lift">
@@ -48,6 +48,135 @@
             <h3 class="text-2xl font-black text-slate-900"><%= Category.count %></h3>
         </div>
     </div>
+
+    <!-- Low Stock Alerts -->
+    <% low_stock_products = Product.all({ stock: { '$lt' => 5 } }) %>
+    <% if low_stock_products.any? %>
+        <div class="mb-12 animate__animated animate__shakeX">
+            <div class="glass p-6 rounded-[32px] border-2 border-orange-500/30 bg-orange-50/20 shadow-lg shadow-orange-100/50">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800">Peringatan Stok Rendah</h2>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Segera lakukan restock untuk produk berikut</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <% low_stock_products.each do |p| %>
+                        <div class="flex items-center gap-3 bg-white/60 p-3 rounded-2xl border border-white/80">
+                            <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                                <img src="<%= p.image_url || 'https://via.placeholder.com/50' %>" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-slate-800 line-clamp-1"><%= p.name %></p>
+                                <p class="text-[10px] text-orange-600 font-black uppercase tracking-widest">Sisa Stok: <%= p.stock %></p>
+                            </div>
+                            <a href="/admin/products/edit?id=<%= p.id %>" class="p-2 text-indigo-600 hover:bg-white rounded-lg transition">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <!-- Analytics Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="glass p-8 rounded-[40px] border border-white/60 shadow-xl bg-white/40">
+            <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-6 h-6 text-emerald-600"></i> Tren Penjualan (7 Hari Terakhir)
+            </h3>
+            <div class="h-64">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        <div class="glass p-8 rounded-[40px] border border-white/60 shadow-xl bg-white/40">
+            <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-6 h-6 text-indigo-600"></i> Volume Pesanan
+            </h3>
+            <div class="h-64">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <%
+        # Pre-calculate data for charts
+        last_7_days = (0..6).map { |i| (Date.today - i).to_s }.reverse
+        
+        # Simple stats calculation for the last 7 days
+        all_orders = Database.collection(:orders).find.to_a
+        
+        sales_data = last_7_days.map do |day|
+            all_orders.select { |o| o['created_at'].to_date.to_s == day }.map { |o| o['total_price'] || 0 }.sum
+        end
+        
+        orders_count_data = last_7_days.map do |day|
+            all_orders.select { |o| o['created_at'].to_date.to_s == day }.size
+        end
+    %>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctxSales = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctxSales, {
+                type: 'line',
+                data: {
+                    labels: <%= last_7_days.to_json %>,
+                    datasets: [{
+                        label: 'Penjualan (Rp)',
+                        data: <%= sales_data.to_json %>,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display : false }, ticks: { font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            });
+
+            const ctxOrders = document.getElementById('ordersChart').getContext('2d');
+            new Chart(ctxOrders, {
+                type: 'bar',
+                data: {
+                    labels: <%= last_7_days.to_json %>,
+                    datasets: [{
+                        label: 'Jumlah Pesanan',
+                        data: <%= orders_count_data.to_json %>,
+                        backgroundColor: '#6366f1',
+                        borderRadius: 12,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false }, ticks: { stepSize: 1, font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        });
+    </script>
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -73,6 +202,14 @@
             </div>
             <h3 class="text-2xl font-black text-slate-900 group-hover:text-white transition mb-2">Kelola Pesanan</h3>
             <p class="text-slate-500 group-hover:text-slate-400 transition text-sm">Proses pengiriman dan pantau status pembayaran.</p>
+        </a>
+
+        <a href="/admin/banners" class="group glass p-8 rounded-[40px] border border-white/60 hover:bg-slate-900 transition-all duration-500">
+            <div class="w-14 h-14 bg-rose-600 text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                <i data-lucide="image" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 group-hover:text-white transition mb-2">Kelola Banner</h3>
+            <p class="text-slate-500 group-hover:text-slate-400 transition text-sm">Pasang iklan promo produk terbaru di HP.</p>
         </a>
     </div>
 </div>

@@ -1,13 +1,25 @@
 require 'erb'
 require 'json'
+require 'csv'
 require_relative 'utils/auth_helper'
 require_relative 'models/user'
 require_relative 'models/product'
 require_relative 'models/category'
 require_relative 'models/order'
+require_relative 'models/review'
+require_relative 'models/banner'
+require_relative 'utils/cloudinary_helper'
 require_relative 'helpers/view_helper'
 
+require_relative 'controllers/auth_controller'
+require_relative 'controllers/admin_controller'
+require_relative 'controllers/shop_controller'
+
 class Router
+  include AuthController
+  include AdminController
+  include ShopController
+
   def initialize(env)
     @req = Rack::Request.new(env)
   end
@@ -37,16 +49,33 @@ class Router
     when '/cart/update'
       handle_cart_update if @req.post?
     when '/checkout'
-      if @req.post?
-        handle_checkout
-      else
-        render_view('checkout')
+      require_auth do
+        if @req.post?
+          handle_checkout
+        else
+          render_view('checkout')
+        end
       end
     when '/order-success'
       render_view('order_success')
     when '/sitemap.xml'
       render_sitemap
+    when '/robots.txt'
+      render_robots
+    when '/search'
+      render_view('search')
+    when '/account'
+      require_auth { render_view('account') }
+    when '/product/review'
+      require_auth { handle_product_review }
+    when '/wishlist/add'
+      require_auth { handle_wishlist_add }
+    when '/account/update'
+      require_auth { handle_account_update if @req.post? }
+    when '/wishlist/remove'
+      require_auth { handle_wishlist_remove }
     when '/login'
+      return redirect_to('/account') if AuthHelper.authenticated?(@req)
       if @req.post?
         handle_login
       else
@@ -55,11 +84,11 @@ class Router
     when '/logout'
       handle_logout
     when '/admin'
-      require_auth { render_view('admin/dashboard') }
+      require_admin { render_view('admin/dashboard') }
     when '/admin/products'
-      require_auth { render_view('admin/products') }
+      require_admin { render_view('admin/products') }
     when '/admin/products/new'
-      require_auth do
+      require_admin do
         if @req.post?
           handle_product_create
         else
@@ -67,7 +96,7 @@ class Router
         end
       end
     when '/admin/products/edit'
-      require_auth do
+      require_admin do
         id = @req.params['id']
         product = Product.find(id)
         if product
@@ -77,11 +106,11 @@ class Router
         end
       end
     when '/admin/products/update'
-      require_auth { handle_product_update if @req.post? }
+      require_admin { handle_product_update if @req.post? }
     when '/admin/products/delete'
-      require_auth { handle_product_delete }
+      require_admin { handle_product_delete }
     when '/admin/categories'
-      require_auth do
+      require_admin do
         if @req.post?
           Category.create(name: @req.params['name'])
           redirect_to('/admin/categories')
@@ -90,14 +119,20 @@ class Router
         end
       end
     when '/admin/categories/delete'
-      require_auth do
+      require_admin do
         Category.delete(@req.params['id'])
         redirect_to('/admin/categories')
       end
+    when '/admin/banners'
+      require_admin { render_view('admin/banners') }
+    when '/admin/banners/add'
+      require_admin { handle_banner_add if @req.post? }
+    when '/admin/banners/delete'
+      require_admin { handle_banner_delete }
     when '/admin/orders'
-      require_auth { render_view('admin/orders') }
+      require_admin { render_view('admin/orders') }
     when '/admin/orders/view'
-      require_auth do
+      require_admin do
         id = @req.params['id']
         order = Order.find(id)
         if order
@@ -107,7 +142,16 @@ class Router
         end
       end
     when '/admin/orders/update'
-      require_auth { handle_order_update }
+      require_admin { handle_order_update }
+    when '/admin/orders/export'
+      require_admin { handle_orders_export }
+    when '/register'
+      return redirect_to('/account') if AuthHelper.authenticated?(@req)
+      if @req.post?
+        handle_register
+      else
+        render_view('register', layout: false)
+      end
     else
       [404, { 'content-type' => 'text/html' }, ['Halaman Tidak Ditemukan']]
     end
@@ -123,175 +167,16 @@ class Router
     end
   end
 
-  def handle_login
-    email = @req.params['email']
-    password = @req.params['password']
-    user = User.authenticate(email, password)
-
-    if user
-      token = AuthHelper.encode_token({ email: user.email, name: user.name, id: user.id.to_s })
-      res = Rack::Response.new
-      res.redirect('/admin')
-      res.set_cookie('auth_token', { value: token, path: '/', httponly: true })
-      res.finish
+  def require_admin
+    if AuthHelper.admin?(@req)
+      yield
     else
-      render_view('login', error: 'Email atau password salah', layout: false)
+      redirect_to('/login')
     end
-  end
-
-  def handle_logout
-    res = Rack::Response.new
-    res.redirect('/login')
-    res.delete_cookie('auth_token')
-    res.finish
   end
 
   def redirect_to(path)
     [302, { 'location' => path }, []]
-  end
-
-  def handle_product_create
-    name = @req.params['name']
-    category_id = @req.params['category_id']
-    price = @req.params['price'].to_f
-    stock = @req.params['stock'].to_i
-    description = @req.params['description']
-    
-    image_url = nil
-    if @req.params['image'] && @req.params['image'][:tempfile]
-      require_relative 'utils/cloudinary_helper'
-      image_url = CloudinaryHelper.upload(@req.params['image'][:tempfile].path)
-    end
-
-    Product.create(
-      name: name,
-      category_id: category_id,
-      price: price,
-      stock: stock,
-      description: description,
-      image_url: image_url
-    )
-    redirect_to('/admin/products')
-  end
-
-  def handle_product_delete
-    id = @req.params['id']
-    if id
-      product = Product.find(id)
-      if product && product.image_url
-        require_relative 'utils/cloudinary_helper'
-        CloudinaryHelper.delete(product.image_url)
-      end
-      Product.delete(id)
-    end
-    redirect_to('/admin/products')
-  end
-
-  def handle_product_update
-    id = @req.params['id']
-    name = @req.params['name']
-    category_id = @req.params['category_id']
-    price = @req.params['price'].to_f
-    stock = @req.params['stock'].to_i
-    description = @req.params['description']
-    
-    update_data = {
-      name: name,
-      category_id: category_id,
-      price: price,
-      stock: stock,
-      description: description
-    }
-
-    if @req.params['image'] && @req.params['image'][:tempfile]
-      require_relative 'utils/cloudinary_helper'
-      
-      # Delete old image if exists
-      product = Product.find(id)
-      CloudinaryHelper.delete(product.image_url) if product && product.image_url
-      
-      update_data[:image_url] = CloudinaryHelper.upload(@req.params['image'][:tempfile].path)
-    end
-
-    Product.update(id, update_data)
-    redirect_to('/admin/products')
-  end
-
-  def handle_order_update
-    id = @req.params['id']
-    status = @req.params['status']
-    resi = @req.params['resi']
-    Order.update_status(id, status, resi) if id && status
-    redirect_to('/admin/orders')
-  end
-
-  def handle_cart_add
-    product_id = @req.params['product_id']
-    quantity = @req.params['quantity'].to_i
-    
-    @req.session['cart'] ||= {}
-    @req.session['cart'][product_id] = (@req.session['cart'][product_id] || 0) + quantity
-    
-    redirect_to('/cart')
-  end
-
-  def handle_cart_remove
-    product_id = @req.params['id']
-    @req.session['cart']&.delete(product_id)
-    redirect_to('/cart')
-  end
-
-  def handle_cart_update
-    product_id = @req.params['product_id']
-    quantity = @req.params['quantity'].to_i
-    if quantity > 0
-      @req.session['cart'][product_id] = quantity
-    else
-      @req.session['cart']&.delete(product_id)
-    end
-    redirect_to('/cart')
-  end
-
-  def handle_checkout
-    cart = @req.session['cart'] || {}
-    return redirect_to('/shop') if cart.empty?
-
-    items = []
-    total = 0
-    cart.each do |id, qty|
-      product = Product.find(id)
-      if product && product.stock >= qty
-        items << { product_id: product.id, name: product.name, price: product.price, quantity: qty }
-        total += product.price * qty
-        # Update stock
-        Product.update(id, { stock: product.stock - qty })
-      end
-    end
-
-    if items.any?
-      order_data = {
-        customer_name: @req.params['customer_name'],
-        contact: @req.params['contact'],
-        customer_email: @req.params['customer_email'],
-        address: @req.params['address'],
-        items: items,
-        total_price: total
-      }
-      
-      result = Order.create(order_data)
-      
-      # Send Receipt Email via Brevo
-      if result && result.inserted_id
-        require_relative 'utils/email_helper'
-        order = Order.find(result.inserted_id.to_s)
-        EmailHelper.send_receipt(order) if order
-      end
-
-      @req.session['cart'] = {}
-      redirect_to('/order-success')
-    else
-      redirect_to('/cart')
-    end
   end
 
   def render_sitemap
@@ -313,7 +198,20 @@ class Router
     
     xml += "</urlset>"
     
-    [200, { 'Content-Type' => 'application/xml' }, [xml]]
+    [200, { 'content-type' => 'application/xml' }, [xml]]
+  end
+
+  def render_robots
+    base_url = "https://#{@req.host_with_port}"
+    txt = "User-agent: *\n"
+    txt += "Allow: /\n"
+    txt += "Disallow: /admin\n"
+    txt += "Disallow: /account\n"
+    txt += "Disallow: /cart\n"
+    txt += "Disallow: /checkout\n\n"
+    txt += "Sitemap: #{base_url}/sitemap.xml\n"
+    
+    [200, { 'content-type' => 'text/plain' }, [txt]]
   end
 
   def render_view(view, locals = {}, layout: true)
@@ -322,9 +220,6 @@ class Router
       return [404, { 'content-type' => 'text/html' }, ["Tampilan tidak ditemukan: #{view}"]]
     end
 
-    # Extract locals into instance variables for ERB access if needed, 
-    # or just use the hash in the binding.
-    # To make locals available as variables in ERB, we can do this:
     locals.each { |k, v| instance_variable_set("@#{k}", v) }
 
     template = File.read(view_path)

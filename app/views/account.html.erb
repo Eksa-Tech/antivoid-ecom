@@ -1,0 +1,175 @@
+<% 
+    user = AuthHelper.current_user(@req)
+    # Find orders for this user
+    orders = Database.collection(:orders).find(user_id: user.id.to_s).sort(created_at: -1).to_a
+    @title = "Akun Saya - Antivoid Shop"
+%>
+
+<div class="max-w-7xl mx-auto px-6 py-12 animate__animated animate__fadeIn">
+    <div class="mb-10">
+        <h1 class="text-4xl font-black text-slate-900 mb-2">Akun Saya</h1>
+        <div class="h-1.5 w-24 bg-indigo-600 rounded-full"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Profile Column -->
+        <div class="lg:col-span-1">
+            <div class="glass p-8 rounded-[40px] border border-white/60 shadow-xl mb-8 relative overflow-hidden group">
+                <div class="absolute -top-12 -right-12 w-24 h-24 bg-indigo-600/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                
+                <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                    <i data-lucide="user" class="w-10 h-10"></i>
+                </div>
+                
+                <h2 class="text-2xl font-black text-slate-900 mb-1"><%= user.name %></h2>
+                <p class="text-indigo-600 font-bold text-sm mb-6 flex items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4"></i> <%= user.email %>
+                </p>
+                
+                <form action="/account/update" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Nama Lengkap</label>
+                        <input type="text" name="name" value="<%= user.name %>" required
+                            class="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">No. WhatsApp</label>
+                        <input type="text" name="whatsapp" value="<%= user.whatsapp %>" placeholder="0812..." 
+                            class="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Alamat Pengiriman Lengkap</label>
+                        <textarea name="address" rows="3" placeholder="Sertakan detail alamat untuk pengiriman..."
+                            class="w-full bg-white/50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition"><%= user.address %></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold text-sm py-3 rounded-xl hover:bg-slate-900 transition flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i> Simpan Profil
+                    </button>
+                </form>
+
+                <div class="mt-8">
+                    <a href="/logout" class="flex items-center justify-center gap-2 bg-red-50 text-red-600 font-black py-4 rounded-2xl border border-red-100 hover:bg-red-600 hover:text-white transition-all active:scale-95">
+                        <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Column -->
+        <div class="lg:col-span-2">
+            <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
+                <i data-lucide="shopping-bag" class="text-indigo-600 w-8 h-8"></i> Riwayat Pesanan
+            </h3>
+
+            <% if orders.empty? %>
+                <div class="glass p-12 rounded-[40px] text-center border border-white/60">
+                    <div class="w-20 h-20 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="package-open" class="w-10 h-10"></i>
+                    </div>
+                    <h4 class="text-xl font-black text-slate-800 mb-2">Belum Ada Pesanan</h4>
+                    <p class="text-slate-500 mb-8">Anda belum melakukan pembelian apa pun. Mulai belanja produk terbaik kami sekarang!</p>
+                    <a href="/shop" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-slate-900 transition">
+                        Belanja Sekarang <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            <% else %>
+                <div class="space-y-6">
+                    <% orders.each do |order_data| %>
+                        <% order = Order.from_hash(order_data) %>
+                        <div class="glass p-6 rounded-[32px] border border-white/60 shadow-lg hover:shadow-indigo-100/50 transition-all group">
+                            <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+                                <div>
+                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Invoice ID</p>
+                                    <p class="text-lg font-black text-slate-800 group-hover:text-indigo-600 transition">#<%= order.id %></p>
+                                </div>
+                                <div class="text-right">
+                                    <% 
+                                        status_class = case order.status
+                                        when 'completed' then 'bg-emerald-100 text-emerald-600'
+                                        when 'pending' then 'bg-orange-100 text-orange-600'
+                                        else 'bg-slate-100 text-slate-600'
+                                        end
+                                    %>
+                                    <span class="<%= status_class %> px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-white">
+                                        <%= order.status %>
+                                    </span>
+                                    <p class="text-[10px] font-bold text-slate-400 mt-2">
+                                        <%= order.created_at ? order.created_at.strftime("%d %B %Y, %H:%M") : "-" %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-indigo-100/50 pt-4 flex items-center justify-between">
+                                <div class="flex -space-x-3 overflow-hidden">
+                                    <% order.items.take(3).each do |item| %>
+                                        <div class="w-10 h-10 rounded-xl border-2 border-white overflow-hidden shadow-sm bg-slate-100">
+                                            <img src="<%= item[:product]&.image_url || 'https://via.placeholder.com/50' %>" class="w-full h-full object-cover">
+                                        </div>
+                                    <% end %>
+                                    <% if order.items.size > 3 %>
+                                        <div class="w-10 h-10 rounded-xl border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 shadow-sm">
+                                            +<%= order.items.size - 3 %>
+                                        </div>
+                                    <% end %>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Total Pembayaran</p>
+                                    <p class="text-xl font-black text-indigo-600"><%= ViewHelper.format_rupiah(order.total_price) %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+
+    <!-- Wishlist Section -->
+    <div class="mt-16">
+        <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
+            <i data-lucide="heart" class="text-red-500 fill-red-500 w-8 h-8"></i> Daftar Keinginan (Wishlist)
+        </h3>
+
+        <% if user.wishlist.nil? || user.wishlist.empty? %>
+            <div class="glass p-12 rounded-[40px] text-center border border-white/60 bg-red-50/10">
+                <i data-lucide="heart-off" class="w-12 h-12 text-slate-300 mx-auto mb-4"></i>
+                <p class="text-slate-500 font-medium">Belum ada produk di wishlist Anda.</p>
+            </div>
+        <% else %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% user.wishlist.each do |pid| %>
+                    <% p = Product.find(pid) %>
+                    <% if p %>
+                        <div class="glass p-4 rounded-[32px] border border-white/60 hover:shadow-xl transition relative group">
+                            <form action="/wishlist/remove" method="POST" class="absolute top-4 right-4 z-10">
+                                <input type="hidden" name="product_id" value="<%= p.id %>">
+                                <button type="submit" class="w-8 h-8 bg-white/80 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition shadow-sm">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                            
+                            <div class="aspect-square bg-slate-100 rounded-2xl overflow-hidden mb-4">
+                                <img src="<%= p.image_url %>" class="w-full h-full object-cover">
+                            </div>
+                            <h4 class="font-black text-slate-800 line-clamp-1 mb-1"><%= p.name %></h4>
+                            <p class="text-indigo-600 font-black mb-4"><%= ViewHelper.format_rupiah(p.price) %></p>
+                            
+                            <div class="flex gap-2">
+                                <a href="/product?id=<%= p.id %>" class="flex-grow bg-white border border-slate-200 text-slate-700 py-2 rounded-xl font-bold text-xs text-center hover:bg-slate-50 transition">
+                                    Detail
+                                </a>
+                                <form action="/cart/add" method="POST" class="flex-shrink-0">
+                                    <input type="hidden" name="product_id" value="<%= p.id %>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="bg-indigo-600 text-white p-2 rounded-xl hover:bg-slate-900 transition flex items-center justify-center">
+                                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% end %>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+</div>

@@ -2,53 +2,84 @@
     @title = "Antivoid Shop - Toko Online Premium & Modern"
     @description = "Selamat datang di Antivoid Shop. Temukan koleksi produk gaya hidup premium dengan desain modern Glassmorphism."
 %>
-<div class="relative overflow-hidden pt-12 pb-20 px-6">
-    <!-- Hero Section -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div class="animate__animated animate__fadeInLeft">
-            <span class="inline-block px-4 py-1.5 rounded-full glass bg-indigo-50 text-indigo-600 text-sm font-bold mb-6 border border-indigo-100 uppercase tracking-widest">Koleksi Baru 2026</span>
-            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 leading-[1.1] mb-8">
-                Upgrade Gaya Hidup <br/>
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Masa Depan Anda</span>
-            </h1>
-            <p class="text-xl text-slate-500 mb-10 max-w-lg leading-relaxed">
-                Temukan koleksi produk pilihan berkualitas tinggi dengan desain modern dan performa terbaik di Antivoid Shop.
-            </p>
-            <div class="flex flex-wrap gap-4">
-                <a href="/shop" class="group bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition flex items-center gap-2">
-                    Belanja Sekarang <i data-lucide="arrow-right" class="group-hover:translate-x-1 transition"></i>
-                </a>
-                <a href="/categories" class="glass px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/80 transition text-slate-700 flex items-center gap-2">
-                    Telusuri Kategori
-                </a>
-            </div>
-            
-            <div class="mt-12 flex items-center gap-8 grayscale opacity-50">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Brand" class="h-6">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Brand" class="h-6">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Brand" class="h-8">
-            </div>
-        </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+    .swiper-pagination-bullet-active { background: #6366f1 !important; }
+</style>
 
-        <div class="relative animate__animated animate__fadeInRight">
-            <div class="absolute inset-0 bg-indigo-400 blur-[120px] opacity-20 rounded-full translate-x-10 translate-y-10"></div>
-            <div class="glass p-4 rounded-[40px] shadow-2xl relative overflow-hidden border border-white/60">
-                <img class="rounded-[30px] w-full aspect-square md:aspect-auto md:h-[500px] object-cover" 
-                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-                    alt="Featured Product">
-                <div class="absolute bottom-10 left-10 glass p-6 rounded-2xl shadow-xl max-w-xs animate__animated animate__fadeInUp animate__delay-1s border border-white/50">
-                    <p class="text-indigo-600 font-bold text-sm mb-1 uppercase tracking-tight">Edisi Terbatas</p>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">UltraBoost X v2.0</h3>
-                    <div class="flex items-center justify-between">
-                        <span class="text-2xl font-black text-slate-900"><%= ViewHelper.format_rupiah(189.99) %></span>
-                        <a href="/shop" class="bg-slate-900 text-white p-2 rounded-lg hover:bg-indigo-600 transition">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                        </a>
-                    </div>
+<% active_banners = Banner.active %>
+
+<div class="relative overflow-hidden pl-4 pr-4 pt-4 pb-10">
+    <% if active_banners.empty? %>
+        <!-- Fallback Hero (Static) if no banners -->
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate__animated animate__fadeInLeft">
+                <span class="inline-block px-4 py-1.5 rounded-full glass bg-indigo-50 text-indigo-600 text-sm font-bold mb-6 border border-indigo-100 uppercase tracking-widest">Koleksi Baru 2026</span>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 leading-[1.1] mb-8">
+                    Upgrade Gaya Hidup <br/>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Masa Depan Anda</span>
+                </h1>
+                <p class="text-xl text-slate-500 mb-10 max-w-lg leading-relaxed">
+                    Temukan koleksi produk pilihan berkualitas tinggi dengan desain modern dan performa terbaik di Antivoid Shop.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="/shop" class="group bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition flex items-center gap-2">
+                        Belanja Sekarang <i data-lucide="arrow-right" class="group-hover:translate-x-1 transition"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="relative hidden md:block">
+                <div class="glass p-4 rounded-[40px] shadow-2xl border border-white/60">
+                    <img class="rounded-[30px] w-full h-[500px] object-cover" 
+                        src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80">
                 </div>
             </div>
         </div>
-    </div>
+    <% else %>
+        <!-- Swiper Slider -->
+        <div class="swiper mainSwiper px-6">
+            <div class="swiper-wrapper">
+                <% active_banners.each do |banner| %>
+                    <% banner_url = banner.link.to_s.match?(/^(http|\/)/) ? banner.link : (banner.link.to_s.empty? ? '#' : "http://#{banner.link}") %>
+                    <div class="swiper-slide pt-4 pb-12">
+                        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[400px]">
+                            <div class="animate__animated animate__fadeInLeft py-4 lg:py-10">
+                                <h2 class="text-4xl md:text-5xl lg:text-7xl font-extrabold text-slate-900 leading-[1.1] mb-4 lg:mb-6">
+                                    <%= banner.title %>
+                                </h2>
+                                <p class="text-xl lg:text-2xl text-indigo-600 font-black mb-8 lg:mb-10 tracking-wide uppercase">
+                                    <%= banner.subtitle %>
+                                </p>
+                                <a href="<%= banner_url %>" class="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 lg:px-10 lg:py-5 rounded-2xl font-black text-md lg:text-lg hover:bg-indigo-600 transition shadow-2xl">
+                                    Lihat Promo <i data-lucide="external-link" class="w-5 h-5 lg:w-6 lg:h-6"></i>
+                                </a>
+                            </div>
+                            <div class="relative py-4 lg:py-10">
+                                <a href="<%= banner_url %>" class="block glass p-2 lg:p-4 rounded-[30px] lg:rounded-[40px] shadow-2xl border border-white/60 overflow-hidden transform hover:scale-[1.02] transition-transform duration-500">
+                                    <img class="rounded-[20px] lg:rounded-[30px] w-full h-[300px] lg:h-[450px] object-cover shadow-inner" src="<%= banner.image_url %>">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+            <div class="swiper-pagination !-bottom-1"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new Swiper(".mainSwiper", {
+                    autoplay: { delay: 5000, disableOnInteraction: false },
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    speed: 1000,
+                    loop: true,
+                    effect: 'fade',
+                    fadeEffect: { crossFade: true }
+                });
+            });
+        </script>
+    <% end %>
 </div>
 
 <!-- Featured Products Grid -->
@@ -65,7 +96,8 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <% Product.all.take(4).each do |product| %>
-            <div class="group glass rounded-3xl p-4 hover-lift border border-white/40 shadow-sm transition-all hover:shadow-xl hover:shadow-indigo-100">
+            <div class="group glass rounded-3xl p-4 hover-lift border border-white/40 shadow-sm transition-all hover:shadow-xl hover:shadow-indigo-100 relative">
+                <a href="/product?id=<%= product.id %>" class="absolute inset-0 z-0"></a>
                 <div class="relative aspect-square rounded-2xl overflow-hidden mb-6 bg-slate-100">
                     <img src="<%= product.image_url || 'https://via.placeholder.com/400' %>" 
                         alt="<%= product.name %>" 
@@ -78,9 +110,9 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition"><%= product.name %></h3>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-2xl font-black text-indigo-600"><%= ViewHelper.format_rupiah(product.price) %></p>
-                        <a href="/product?id=<%= product.id %>" class="bg-white border border-slate-200 text-slate-700 p-2 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition shadow-sm">
+                    <div class="flex items-center justify-between relative z-10">
+                        <p class="text-2xl font-black text-indigo-600 pointer-events-none"><%= ViewHelper.format_rupiah(product.price) %></p>
+                        <a href="/product?id=<%= product.id %>" class="bg-white border border-slate-200 text-slate-700 p-2 rounded-xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition shadow-sm cursor-pointer">
                             <i data-lucide="eye" class="w-5 h-5"></i>
                         </a>
                     </div>

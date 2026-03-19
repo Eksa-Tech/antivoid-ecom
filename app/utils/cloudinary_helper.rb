@@ -7,7 +7,13 @@ module CloudinaryHelper
 
   def self.upload(file_path)
     configure
-    result = Cloudinary::Uploader.upload(file_path)
+    result = Cloudinary::Uploader.upload(file_path, {
+      folder: 'antivoid_shop',
+      transformation: [
+        { width: 1200, crop: :limit },
+        { quality: "auto", fetch_format: :auto }
+      ]
+    })
     result['secure_url']
   rescue StandardError => e
     puts "Cloudinary upload error: #{e.message}"

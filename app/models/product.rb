@@ -17,8 +17,11 @@ class Product
   end
 
   def self.find(id)
+    return nil if id.nil? || id.to_s.strip.empty?
     data = Database.collection(COLLECTION).find(_id: BSON::ObjectId.from_string(id)).first
     data ? from_hash(data) : nil
+  rescue BSON::Error::InvalidObjectId, BSON::Error::InvalidString
+    nil
   end
 
   def self.create(attrs)

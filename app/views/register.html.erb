@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Antivoid Shop</title>
+    <title>Daftar Akun - Antivoid Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="icon" href="https://img.icons8.com/?size=100&id=44816&format=png&color=000000" type="image/png">
@@ -28,8 +28,8 @@
                     </div>
                     <span class="text-2xl font-black text-slate-900 tracking-tighter">ANTIVOID</span>
                 </a>
-                <h1 class="text-3xl font-black text-slate-900 mb-2">Selamat Datang</h1>
-                <p class="text-slate-500">Masuk untuk melanjutkan belanja Anda</p>
+                <h1 class="text-3xl font-black text-slate-900 mb-2">Buat Akun Baru</h1>
+                <p class="text-slate-500">Bergabunglah dengan komunitas Antivoid</p>
             </div>
 
             <div class="glass p-8 rounded-[40px] shadow-2xl relative overflow-hidden">
@@ -39,7 +39,15 @@
                     </div>
                 <% end %>
 
-                <form action="/login" method="POST" class="space-y-5">
+                <form action="/register" method="POST" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+                            <input type="text" name="name" required placeholder="Nama Anda"
+                                class="w-full bg-white/50 border border-slate-200 rounded-2xl pl-12 pr-6 py-4 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm">
+                        </div>
+                    </div>
                     <div>
                         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Alamat Email</label>
                         <div class="relative">
@@ -59,14 +67,14 @@
 
                     <div class="pt-4">
                         <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-slate-900 hover:shadow-none transition-all duration-300 flex items-center justify-center gap-3 active:scale-95">
-                            Masuk Ke Akun <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                            Daftar Sekarang <i data-lucide="arrow-right" class="w-6 h-6"></i>
                         </button>
                     </div>
                 </form>
 
                 <div class="mt-8 pt-8 border-t border-slate-100 text-center">
-                    <p class="text-slate-500 text-sm">Belum punya akun? 
-                        <a href="/register" class="text-indigo-600 font-bold hover:underline">Daftar sekarang</a>
+                    <p class="text-slate-500 text-sm">Sudah punya akun? 
+                        <a href="/login" class="text-indigo-600 font-bold hover:underline">Masuk di sini</a>
                     </p>
                 </div>
             </div>
