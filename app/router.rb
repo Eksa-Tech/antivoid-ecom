@@ -128,6 +128,8 @@ class Router
       end
     when '/admin/banners'
       require_admin { render_view('admin/banners') }
+    when '/admin/banners/new'
+      require_admin { render_view('admin/banners_new') }
     when '/admin/banners/add'
       require_admin { handle_banner_add if @req.post? }
     when '/admin/banners/delete'
